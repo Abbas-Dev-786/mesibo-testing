@@ -1,7 +1,6 @@
 let api;
-let isMesiboinitialized = false;
 
-class MesiboListener {
+export default class MesiboListener {
   Mesibo_OnConnectionStatus(status, value) {
     if (status === MESIBO_STATUS_ONLINE) {
       // store.dispatch(initializeMesiboInRedux());
@@ -27,6 +26,27 @@ class MesiboListener {
     );
   }
 
+  async getMessages() {
+    const profile = api.getProfile("test@gmail.com");
+    const rs = profile.createReadSession(this);
+    rs.enableReadReceipt(true);
+    // rs.read(100);
+
+    console.log(await rs.read(100));
+  }
+
+  async afterScriptLoads() {
+    api = new Mesibo();
+    api.setAccessToken(
+      "3ea983703a784ac352dbc2b1da0e2f544ec893a8385585c34ecc4b515bla162a94ac03"
+    );
+    api.setListener(this);
+    await api.setDatabase("mesibo.db");
+    api.setAppName("testing.mesibo");
+    api.start();
+    window.api = api;
+  }
+
   Mesibo_onMessage = function (msg) {
     /* Messaging documentation https://mesibo.com/documentation/api/messaging/ */
     if (msg.isIncoming()) {
@@ -50,38 +70,46 @@ class MesiboListener {
       }
     }
   };
-}
-const afterScriptLoads = async () => {
-  api = new Mesibo();
-  api.setAccessToken(
-    "3ea983703a784ac352dbc2b1da0e2f544ec893a8385585c34ecc4b515bla162a94ac03"
-  );
-  api.setListener(new MesiboListener());
-  await api.setDatabase("mesibo.db");
-  api.setAppName("testing.mesibo");
-  api.start();
-  window.api = api;
-};
 
-const initializeMesibo = () => {
-  if (isMesiboinitialized) {
-    return;
-  } else {
-    afterScriptLoads();
-    isMesiboinitialized = true;
+  sendMessage() {
+    const profile = api.getProfile("test@gmail.com");
+    const msg = profile.newMessage();
+    msg.message = "Hello message";
+
+    msg.send();
   }
-};
+}
+// const afterScriptLoads = async () => {
+//   api = new Mesibo();
+//   api.setAccessToken(
+//     "3ea983703a784ac352dbc2b1da0e2f544ec893a8385585c34ecc4b515bla162a94ac03"
+//   );
+//   api.setListener(new MesiboListener());
+//   await api.setDatabase("mesibo.db");
+//   api.setAppName("testing.mesibo");
+//   api.start();
+//   window.api = api;
+// };
 
-const getMesiboApi = () => {
-  return api;
-};
+// const initializeMesibo = () => {
+//   if (isMesiboinitialized) {
+//     return;
+//   } else {
+//     afterScriptLoads();
+//     isMesiboinitialized = true;
+//   }
+// };
 
-const getListener = () => {
-  return new MesiboListener();
-};
+// const getMesiboApi = () => {
+//   return api;
+// };
 
-const getProfile = (userId) => {
-  return api.getProfile(userId);
-};
+// const getListener = () => {
+//   return new MesiboListener();
+// };
 
-export { getMesiboApi, initializeMesibo, getProfile, getListener };
+// const getProfile = (userId) => {
+//   return api.getProfile(userId);
+// };
+
+// export {

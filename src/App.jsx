@@ -1,44 +1,41 @@
 import { useEffect } from "react";
-import { getListener, getProfile, initializeMesibo } from "./mesibo.js";
+import MesiboListener from "./mesibo.js";
 
 const App = () => {
-  const sendMessage = () => {
-    const profile = getProfile("test@gmail.com");
-    const msg = profile.newMessage();
-    msg.message = "Hello message";
-
-    msg.send();
-  };
-
-  const getUserProfile = async () => {
-    console.log(await getProfile("test@gmail.com").getValues());
-  };
-
-  const getMessages = () => {
-    const profile = getProfile("test@gmail.com");
-    const rs = profile.createReadSession(null, (msg) => console.log(msg));
-    rs.enableReadReceipt(true);
-    // rs.read(100);
-
-    console.log(rs.read(100));
-  };
+  const mesibo = new MesiboListener();
 
   useEffect(() => {
-    // Mesibo initialization and usage
-    initializeMesibo();
+    mesibo.afterScriptLoads();
   }, []);
+
+  // const sendMessage = () => {
+  //   const profile = getProfile("test@gmail.com");
+  //   const msg = profile.newMessage();
+  //   msg.message = "Hello message";
+
+  //   msg.send();
+  // };
+
+  // const getUserProfile = async () => {
+  //   console.log(await getProfile("test@gmail.com").getValues());
+  // };
+
+  // useEffect(() => {
+  //   // Mesibo initialization and usage
+  //   initializeMesibo();
+  // }, []);
 
   return (
     <div>
-      <button type="button" onClick={sendMessage}>
+      <button type="button" onClick={mesibo.sendMessage}>
         Send Message
       </button>
 
-      <button type="button" onClick={getUserProfile}>
+      {/* <button type="button" onClick={getUserProfile}>
         Get profile
-      </button>
+      </button> */}
 
-      <button type="button" onClick={getMessages}>
+      <button type="button" onClick={mesibo.getMessages}>
         Get Messages
       </button>
     </div>
